@@ -1,0 +1,67 @@
+---
+- name: "Install default packages"
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: "Swap off"
+  ansible.builtin.command: swapoff -a
+  when: ansible_facts['swaptotal_mb'] > 0
+  changed_when: true
+
+- name: "Mask swap systemd units"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    masked: true
+  loop: "{{ common_swap_units }}"
+
+- name: "Kernel modules for automatic loading"
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/k3s.conf
+    content: "{{ common_kernel_modules | join('\n') }}\n"
+    mode: "0644"
+
+- name: "Load modules right now"
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ common_kernel_modules }}"
+
+- name: "Sysctl settings"
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/99-k3s.conf
+  loop: "{{ common_sysctl }}"
+
+- name: "Install systemd-timesyncd"
+  ansible.builtin.apt:
+    name: systemd-timesyncd
+    state: present
+
+- name: "NTP servers"
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/timesyncd.conf
+    regexp: "^#?NTP="
+    line: "NTP={{ common_ntp_server }}"
+  notify: "Restart timesyncd"
+
+- name: "Systemd-timesyncd up"
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+    enabled: true
+    state: started
+
+- name: "On NTP sync"
+  ansible.builtin.command: timedatectl set-ntp true
+  changed_when: false
+
+
+- name: "Timezone"
+  community.general.timezone:
+    name: "{{ common_timezone }}"

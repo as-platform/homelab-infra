@@ -1,0 +1,5 @@
+---
+- name: "Control plane node configuration"
+  hosts: k3s_server
+  roles:
+    - common

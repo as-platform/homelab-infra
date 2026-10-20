@@ -1,0 +1,4 @@
+---
+kubeconfig_download_dest: "~/.kube/config-k3s"
+k3s_kubeconfig_mode: "0644"
+private_key_file: ~/.ssh/id_ed25519
