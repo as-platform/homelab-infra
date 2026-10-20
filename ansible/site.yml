@@ -3,3 +3,4 @@
   hosts: k3s_server
   roles:
     - common
+    - k3s

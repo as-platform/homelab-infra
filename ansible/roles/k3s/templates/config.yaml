@@ -1,0 +1,10 @@
+---
+# {{ ansible_managed }}
+write-kubeconfig-mode: "0600"
+node-name: "{{ ansible_hostname }}"
+disable:
+{% for component in k3s_disable_components %}
+  - {{ component }}
+{% endfor %}
+tls-san:
+  - "{{ ansible_host }}"

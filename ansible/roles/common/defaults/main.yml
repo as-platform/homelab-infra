@@ -19,4 +19,4 @@ common_sysctl:
   - { name: "fs.inotify.max_user_instances", value: "512" }
 
 common_swap_units:
-  - 'dev-disk-by\x2ddiskseq-1\x2dpart3.swap'
+  - "dev-disk-by\\x2ddiskseq-1\\x2dpart3.swap"

@@ -61,7 +61,6 @@
   ansible.builtin.command: timedatectl set-ntp true
   changed_when: false
 
-
 - name: "Timezone"
   community.general.timezone:
     name: "{{ common_timezone }}"
