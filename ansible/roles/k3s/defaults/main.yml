@@ -3,3 +3,4 @@ k3s_version: "v1.37.1+k3s1"
 k3s_disable_components:
   - traefik
   - servicelb
+k3s_context_name: "homelab"

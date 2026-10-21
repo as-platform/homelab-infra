@@ -47,9 +47,39 @@
   no_log: true
   register: k3s_slurp_config
 
+- name: "Build kubeconfig with context name"
+  vars:
+    k3s_main_config: "{{ k3s_slurp_config.content | b64decode | from_yaml }}"
+  ansible.builtin.set_fact:
+    k3s_modified_config: >-
+      {{
+        k3s_main_config | combine({
+          'current-context': k3s_context_name,
+          'clusters': [
+            k3s_main_config.clusters[0] | combine({
+              'name': k3s_context_name,
+              'cluster': k3s_main_config.clusters[0].cluster | combine({
+                'server': 'https://' ~ ansible_host ~ ':6443'
+              })
+            })
+          ],
+          'users': [ k3s_main_config.users[0] | combine({'name': k3s_context_name}) ],
+          'contexts': [
+            k3s_main_config.contexts[0] | combine({
+              'name': k3s_context_name,
+              'context': k3s_main_config.contexts[0].context | combine({
+                'cluster': k3s_context_name,
+                'user': k3s_context_name
+              })
+            })
+          ]
+        }, recursive=True)
+      }}
+  no_log: true
+
 - name: "Save modified kubeconfig to Mac"
   ansible.builtin.copy:
-    content: "{{ (k3s_slurp_config.content | b64decode) | replace('https://127.0.0.1:6443', 'https://' ~ ansible_host ~ ':6443') }}"
+    content: "{{ k3s_modified_config | to_nice_yaml(indent=2) }}"
     dest: "{{ lookup('env', 'HOME') }}/.kube/config-k3s"
     mode: "0600"
   no_log: true
