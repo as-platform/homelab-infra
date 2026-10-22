@@ -4,3 +4,4 @@
   roles:
     - common
     - k3s
+    - helm
