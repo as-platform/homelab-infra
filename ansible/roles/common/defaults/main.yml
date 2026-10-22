@@ -3,6 +3,7 @@ common_packages:
   - curl
   - gnupg
   - ca-certificates
+  - git
 
 common_timezone: "Asia/Omsk"
 common_ntp_server: "pool.ntp.org"
