@@ -20,7 +20,7 @@ ansible/
 ## Роли
 
 - **common** — пакеты, часовой пояс и NTP, модули ядра (`overlay`, `br_netfilter`), sysctl, отключение swap.
-- **k3s** — установка K3s официальным скриптом (версия задаётся в `k3s_version`), конфиг `/etc/rancher/k3s/config.yaml`, отключены `traefik` и `servicelb`. После установки ждёт готовности узла и сохраняет kubeconfig локально в `~/.kube/config-k3s`.
+- **k3s** — установка K3s официальным скриптом (версия задаётся в `k3s_version`), конфиг `/etc/rancher/k3s/config.yaml`, отключены `traefik` и `servicelb`. После установки ждёт готовности узла и сохраняет kubeconfig в `~/.kube/config-k3s` и вливает его в `~/.kube/config` (остальные контексты не затрагиваются, `current-context` не меняется, перед записью создаётся бэкап).
 
 ## Использование
 
@@ -33,7 +33,7 @@ ansible-playbook site.yml
 Затем:
 
 ```bash
-export KUBECONFIG=~/.kube/config-k3s
+kubectx <k3s_context_name>
 kubectl get nodes
 ```
 
