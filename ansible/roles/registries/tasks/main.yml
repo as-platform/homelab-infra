@@ -1,0 +1,31 @@
+---
+- name: "Add Zot address into /etc/hosts"
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '\s{{ registries_zot_domain | regex_escape }}$'
+    line: "{{ registries_zot_address }} {{ registries_zot_domain }}"
+    state: present
+
+- name: "Read registry CA from cluster secret"
+  ansible.builtin.command: >-
+    /usr/local/bin/kubectl -n {{ registries_ca_secret_namespace }}
+    get secret {{ registries_ca_secret_name }}
+    -o jsonpath='{.data.tls\.crt}'
+  register: registries_ca_secret
+  changed_when: false
+  check_mode: false
+
+- name: "Install registry CA on node"
+  ansible.builtin.copy:
+    content: "{{ registries_ca_secret.stdout | b64decode }}"
+    dest: "{{ registries_ca_path }}"
+    mode: "0644"
+  notify: "Restart k3s"
+
+- name: "Configure K3s registries via template"
+  ansible.builtin.template:
+    src: registries.yaml
+    dest: /etc/rancher/k3s/registries.yaml
+    mode: "0600"
+  no_log: true
+  notify: "Restart k3s"

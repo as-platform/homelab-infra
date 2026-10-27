@@ -1,0 +1,6 @@
+---
+registries_zot_address: 192.168.1.50
+registries_zot_domain: zot.homelab
+registries_ca_secret_namespace: cert-manager
+registries_ca_secret_name: homelab-ca
+registries_ca_path: /etc/rancher/k3s/zot-ca.crt

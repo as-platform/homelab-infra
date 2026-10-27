@@ -1,0 +1,8 @@
+---
+configs:
+  "{{ registries_zot_domain }}":
+    auth:
+      username: "{{ registries_zot_user }}"
+      password: "{{ registries_zot_password }}"
+    tls:
+      ca_file: "{{ registries_ca_path }}"
