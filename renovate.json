@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Helm client version in the helm role",
+      "managerFilePatterns": [
+        "/roles/helm/defaults/main\\.yml$/"
+      ],
+      "matchStrings": [
+        "helm_version: \"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "helm/helm"
+    },
+    {
+      "customType": "regex",
+      "description": "K3s version in the k3s role",
+      "managerFilePatterns": [
+        "/roles/k3s/defaults/main\\.yml$/"
+      ],
+      "matchStrings": [
+        "k3s_version: \"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "k3s-io/k3s",
+      "versioningTemplate": "semver-coerced"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": [
+        "k3s-io/k3s"
+      ],
+      "automerge": false,
+      "separateMinorPatch": true
+    }
+  ]
+}
