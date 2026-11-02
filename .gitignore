@@ -1,0 +1,10 @@
+*.retry
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+.vault-pass*
+.env
+.env.*
+*.pem
+*.key
