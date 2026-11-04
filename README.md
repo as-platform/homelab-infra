@@ -1,28 +1,30 @@
 # homelab-infra
 
-Ansible-код для развёртывания домашнего Kubernetes-кластера на [K3s](https://k3s.io).
+🇷🇺 [Русская версия](README_RUS.md)
 
-## Структура
+Ansible code for deploying a home Kubernetes cluster on [K3s](https://k3s.io).
+
+## Structure
 
 ```
 ansible/
 ├── ansible.cfg
-├── site.yml              # основной плейбук
-├── requirements.yml      # коллекции Ansible
+├── site.yml              # main playbook
+├── requirements.yml      # Ansible collections
 ├── inventory/
-│   ├── hosts.yml         # группы k3s_server / k3s_agent
+│   ├── hosts.yml         # k3s_server / k3s_agent groups
 │   └── group_vars/all.yml
 └── roles/
-    ├── common/           # базовая подготовка узла
-    └── k3s/              # установка и настройка K3s
+    ├── common/           # basic node preparation
+    └── k3s/              # K3s installation and configuration
 ```
 
-## Роли
+## Roles
 
-- **common** — пакеты, часовой пояс и NTP, модули ядра (`overlay`, `br_netfilter`), sysctl, отключение swap.
-- **k3s** — установка K3s официальным скриптом (версия задаётся в `k3s_version`), конфиг `/etc/rancher/k3s/config.yaml`, отключены `traefik` и `servicelb`. После установки ждёт готовности узла и сохраняет kubeconfig в `~/.kube/config-k3s` и вливает его в `~/.kube/config` (остальные контексты не затрагиваются, `current-context` не меняется, перед записью создаётся бэкап).
+- **common** — packages, time zone and NTP, kernel modules (`overlay`, `br_netfilter`), sysctl, swap disabled.
+- **k3s** — installs K3s with the official script (the version is set in `k3s_version`), writes the config `/etc/rancher/k3s/config.yaml`, disables `traefik` and `servicelb`. After installation it waits for the node to become ready, saves the kubeconfig to `~/.kube/config-k3s` and merges it into `~/.kube/config` (other contexts are untouched, `current-context` does not change, and a backup is created before writing).
 
-## Использование
+## Usage
 
 ```bash
 cd ansible
@@ -30,11 +32,11 @@ ansible-galaxy collection install -r requirements.yml
 ansible-playbook site.yml
 ```
 
-Затем:
+Then:
 
 ```bash
 kubectx <k3s_context_name>
 kubectl get nodes
 ```
 
-Адреса узлов задаются в `ansible/inventory/hosts.yml`, параметры ролей — в `roles/*/defaults/main.yml`.
+Node addresses are set in `ansible/inventory/hosts.yml`, role parameters in `roles/*/defaults/main.yml`.
