@@ -6,3 +6,8 @@
     - k3s
     - helm
     - registries
+
+- name: "Worker node configuration"
+  hosts: k3s_agent
+  roles:
+    - common
