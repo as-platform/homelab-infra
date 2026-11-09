@@ -1,0 +1,5 @@
+---
+- name: "Restart k3s after registries change"
+  ansible.builtin.systemd:
+    name: "{{ registries_k3s_service }}"
+    state: restarted

@@ -6,12 +6,19 @@
     line: "{{ registries_zot_address }} {{ registries_zot_domain }}"
     state: present
 
+- name: "Create K3s configuration directory"
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    mode: "0755"
+
 - name: "Read registry CA from cluster secret"
   ansible.builtin.command: >-
     /usr/local/bin/kubectl -n {{ registries_ca_secret_namespace }}
     get secret {{ registries_ca_secret_name }}
     -o jsonpath='{.data.tls\.crt}'
   register: registries_ca_secret
+  delegate_to: "{{ groups['k3s_server'][0] }}"
   changed_when: false
   check_mode: false
 
@@ -20,7 +27,7 @@
     content: "{{ registries_ca_secret.stdout | b64decode }}"
     dest: "{{ registries_ca_path }}"
     mode: "0644"
-  notify: "Restart k3s"
+  notify: "Restart k3s after registries change"
 
 - name: "Configure K3s registries via template"
   ansible.builtin.template:
@@ -28,4 +35,4 @@
     dest: /etc/rancher/k3s/registries.yaml
     mode: "0600"
   no_log: true
-  notify: "Restart k3s"
+  notify: "Restart k3s after registries change"

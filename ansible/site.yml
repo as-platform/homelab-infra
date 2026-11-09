@@ -11,3 +11,4 @@
   hosts: k3s_agent
   roles:
     - common
+    - registries
